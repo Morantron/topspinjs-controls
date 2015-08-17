@@ -9,7 +9,7 @@ var five = require("johnny-five")
 
 left_pin = +process.env.TOPSPINJS_LEFT_PIN || 37;
 right_pin = +process.env.TOPSPINJS_RIGHT_PIN || 15;
-domain = process.env.TOPSPINJS_DOMAIN;
+domain = process.env.TOPSPINJS_DOMAIN || 'redbooth.topspinjs.com'; // FIXME
 
 if (!domain) {
   throw new Error('TOPSPINJS_DOMAIN environment variable is mandatory');
