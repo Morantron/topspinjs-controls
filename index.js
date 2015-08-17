@@ -1,46 +1,38 @@
-var five = require("johnny-five"),
-request = require("request"),
-  raspi = require("raspi-io"),
-  board, button;
+var five = require("johnny-five")
+  , request = require("request")
+  , raspi = require("raspi-io")
+  , left_pin
+  , right_pin
+  , domain
+  , endpoint
+  , board;
+
+left_pin = +process.env.TOPSPINJS_LEFT_PIN || 37;
+right_pin = +process.env.TOPSPINJS_RIGHT_PIN || 15;
+domain = process.env.TOPSPINJS_DOMAIN;
+
+endpoint = 'http://' + domain + '/api/games/current';
 
 board = new five.Board({
-	io: new raspi()
+  io: new raspi()
 });
 
-board.on("ready", function() {
+board.on("ready", function () {
+  var left_button
+    , right_button;
 
-  // Create a new `button` hardware instance.
-  // This example allows the button module to
-  // create a completely default instance
+  console.log('ready!');
 
-	console.log('ready!');
+  left_button = new five.Button(left_pin);
+  right_button = new five.Button(right_pin);
 
-  var button = new five.Button(37);
-
-  var button2 = new five.Button(15);
-
-  // Button Event API
-  // "down" the button is pressed
-  button.on("down", function() {
-    console.log("down");
+  left_button.on("up", function () {
+    console.log("left up");
+    request.post(endpoint + "/left");
   });
 
-  // "hold" the button is pressed for specified time.
-  //        defaults to 500ms (1/2 second)
-  //        set
-  button.on("hold", function() {
-    console.log("hold");
-  });
-
-  // "up" the button is released
-  button.on("up", function() {
-    console.log("up");
-    request.post("http://redbooth.topspinjs.com/api/games/current/left");
-  });
-
-  // "up" the button is released
-  button2.on("up", function() {
-    console.log("up");
-    request.post("http://redbooth.topspinjs.com/api/games/current/right");
+  right_button.on("up", function () {
+    console.log("right up");
+    request.post(endpoint + "/right");
   });
 });
