@@ -1,6 +1,6 @@
-var five = require("johnny-five")
-  , request = require("request")
-  , raspi = require("raspi-io")
+var five = require('johnny-five')
+  , request = require('request')
+  , raspi = require('raspi-io')
   , crypto = require('crypto')
   , token
   , left_pin
@@ -28,7 +28,7 @@ board = new five.Board({
   io: new raspi()
 });
 
-board.on("ready", function () {
+board.on('ready', function () {
   var left_button
     , right_button;
 
@@ -51,9 +51,9 @@ board.on("ready", function () {
       , phrase
       , hash;
 
-    console.log(side + " down");
+    console.log(side + ' down');
 
-    options.url = endpoint + "/" + side;
+    options.url = endpoint + '/' + side;
     options.headers = {};
 
     if (token) {
@@ -68,11 +68,11 @@ board.on("ready", function () {
     request.post(options, callback);
   }
 
-  left_button.on("down", function () {
+  left_button.on('down', function () {
     postSide('left');
   });
 
-  right_button.on("down", function () {
+  right_button.on('down', function () {
     postSide('right');
   });
 });
