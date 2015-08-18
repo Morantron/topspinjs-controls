@@ -40,6 +40,12 @@ board.on("ready", function () {
   left_button = new five.Button(left_pin);
   right_button = new five.Button(right_pin);
 
+  function callback(error, response, body) {
+    if (error) {
+      console.error('Error posting a side event!');
+    }
+  }
+
   function postSide(side) {
     var options = {}
       , phrase
@@ -59,7 +65,7 @@ board.on("ready", function () {
 
     options.headers['X-Timestamp'] = Date.now();
 
-    request.post(options);
+    request.post(options, callback);
   }
 
   left_button.on("down", function () {
