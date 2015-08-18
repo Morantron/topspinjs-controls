@@ -1,46 +1,71 @@
-var five = require("johnny-five"),
-request = require("request"),
-  raspi = require("raspi-io"),
-  board, button;
+var five = require("johnny-five")
+  , request = require("request")
+  , raspi = require("raspi-io")
+  , crypto = require('crypto')
+  , token
+  , left_pin
+  , right_pin
+  , domain
+  , endpoint
+  , wakeup_endpoint
+  , board;
+
+token = process.env.TOPSPINJS_TOKEN;
+left_pin = +process.env.TOPSPINJS_LEFT_PIN || 37;
+right_pin = +process.env.TOPSPINJS_RIGHT_PIN || 15;
+domain = process.env.TOPSPINJS_DOMAIN || 'redbooth.topspinjs.com'; // FIXME
+
+if (!domain) {
+  throw new Error('TOPSPINJS_DOMAIN environment variable is mandatory');
+}
+
+endpoint = 'http://' + domain + '/api/games/current';
+wakeup_endpoint = 'http://' + domain + '/wakeup';
+
+console.log('Target domain: ' + domain);
 
 board = new five.Board({
-	io: new raspi()
+  io: new raspi()
 });
 
-board.on("ready", function() {
+board.on("ready", function () {
+  var left_button
+    , right_button;
 
-  // Create a new `button` hardware instance.
-  // This example allows the button module to
-  // create a completely default instance
+  console.log('Listening ' + left_pin + ' pin for left button');
+  console.log('Listening ' + right_pin + ' pin for right button');
+  console.log('Pins ready!');
+  request.post(wakeup_endpoint);
 
-	console.log('ready!');
+  left_button = new five.Button(left_pin);
+  right_button = new five.Button(right_pin);
 
-  var button = new five.Button(37);
+  function postSide(side) {
+    var options = {}
+      , phrase
+      , hash;
 
-  var button2 = new five.Button(15);
+    console.log(side + " down");
 
-  // Button Event API
-  // "down" the button is pressed
-  button.on("down", function() {
-    console.log("down");
+    options.url = endpoint + "/" + side;
+
+    if (token) {
+      phrase = token + options.url;
+      hash = crypto.createHash('sha1').update(phrase).digest('hex');
+
+      options.headers = {
+        'Authorization': hash
+      };
+    }
+
+    request.post(options);
+  }
+
+  left_button.on("down", function () {
+    postSide('left');
   });
 
-  // "hold" the button is pressed for specified time.
-  //        defaults to 500ms (1/2 second)
-  //        set
-  button.on("hold", function() {
-    console.log("hold");
-  });
-
-  // "up" the button is released
-  button.on("up", function() {
-    console.log("up");
-    request.post("http://redbooth.topspinjs.com/api/games/current/left");
-  });
-
-  // "up" the button is released
-  button2.on("up", function() {
-    console.log("up");
-    request.post("http://redbooth.topspinjs.com/api/games/current/right");
+  right_button.on("down", function () {
+    postSide('right');
   });
 });
