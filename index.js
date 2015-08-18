@@ -48,15 +48,16 @@ board.on("ready", function () {
     console.log(side + " down");
 
     options.url = endpoint + "/" + side;
+    options.headers = {};
 
     if (token) {
       phrase = token + options.url;
       hash = crypto.createHash('sha1').update(phrase).digest('hex');
 
-      options.headers = {
-        'Authorization': hash
-      };
+      options.headers.Authorization = hash;
     }
+
+    options.headers['X-Timestamp'] = Date.now();
 
     request.post(options);
   }
