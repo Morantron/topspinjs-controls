@@ -1,6 +1,8 @@
 var five = require("johnny-five")
   , request = require("request")
   , raspi = require("raspi-io")
+  , crypto = require('crypto')
+  , token
   , left_pin
   , right_pin
   , domain
@@ -8,6 +10,7 @@ var five = require("johnny-five")
   , wakeup_endpoint
   , board;
 
+token = process.env.TOPSPINJS_TOKEN;
 left_pin = +process.env.TOPSPINJS_LEFT_PIN || 37;
 right_pin = +process.env.TOPSPINJS_RIGHT_PIN || 15;
 domain = process.env.TOPSPINJS_DOMAIN || 'redbooth.topspinjs.com'; // FIXME
@@ -37,13 +40,32 @@ board.on("ready", function () {
   left_button = new five.Button(left_pin);
   right_button = new five.Button(right_pin);
 
-  left_button.on("up", function () {
-    console.log("left up");
-    request.post(endpoint + "/left");
+  function postSide(side) {
+    var options = {}
+      , phrase
+      , hash;
+
+    console.log(side + " down");
+
+    options.url = endpoint + "/" + side;
+
+    if (token) {
+      phrase = token + options.url;
+      hash = crypto.createHash('sha1').update(phrase).digest('hex');
+
+      options.headers = {
+        'Authorization': hash
+      };
+    }
+
+    request.post(options);
+  }
+
+  left_button.on("down", function () {
+    postSide('left');
   });
 
-  right_button.on("up", function () {
-    console.log("right up");
-    request.post(endpoint + "/right");
+  right_button.on("down", function () {
+    postSide('right');
   });
 });
