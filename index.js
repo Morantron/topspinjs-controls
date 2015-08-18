@@ -5,6 +5,7 @@ var five = require("johnny-five")
   , right_pin
   , domain
   , endpoint
+  , wakeup_endpoint
   , board;
 
 left_pin = +process.env.TOPSPINJS_LEFT_PIN || 37;
@@ -16,6 +17,7 @@ if (!domain) {
 }
 
 endpoint = 'http://' + domain + '/api/games/current';
+wakeup_endpoint = 'http://' + domain + '/wakeup';
 
 console.log('Target domain: ' + domain);
 
@@ -30,6 +32,7 @@ board.on("ready", function () {
   console.log('Listening ' + left_pin + ' pin for left button');
   console.log('Listening ' + right_pin + ' pin for right button');
   console.log('Pins ready!');
+  request.post(wakeup_endpoint);
 
   left_button = new five.Button(left_pin);
   right_button = new five.Button(right_pin);
