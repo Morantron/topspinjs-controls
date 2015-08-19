@@ -1,0 +1,8 @@
+#!/bin/bash
+
+export TOPSPINJS_TOKEN='put_your_token_here';
+export TOPSPINJS_LEFT_PIN='37'
+export TOPSPINJS_RIGHT_PIN='15'
+export TOPSPINJS_DOMAIN='<put_your_domain_here>.topspinjs.com'
+
+node index.js
