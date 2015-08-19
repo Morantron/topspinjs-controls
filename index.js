@@ -11,8 +11,8 @@ var five = require('johnny-five')
   , board;
 
 token = process.env.TOPSPINJS_TOKEN;
-left_pin = +process.env.TOPSPINJS_LEFT_PIN || 37;
-right_pin = +process.env.TOPSPINJS_RIGHT_PIN || 15;
+left_pin = +process.env.TOPSPINJS_LEFT_PIN || 35;
+right_pin = +process.env.TOPSPINJS_RIGHT_PIN || 37;
 domain = process.env.TOPSPINJS_DOMAIN || 'redbooth.topspinjs.com'; // FIXME
 
 if (!domain) {
